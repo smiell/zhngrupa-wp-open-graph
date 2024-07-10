@@ -3,7 +3,7 @@ namespace ZHNGRUPA\OpenGraph\Settings;
 
 class Settings_Page {
     private $capability = 'manage_options';
-    private $option_name = 'zhngrupa_open_graph_options'
+    private $option_name = 'zhngrupa_open_graph_options';
     private static $instance = null;
 
     private $fields = [
