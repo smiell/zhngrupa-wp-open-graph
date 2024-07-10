@@ -3,7 +3,9 @@ namespace ZHNGRUPA\OpenGraph\Settings;
 
 class Settings_Page {
     private $capability = 'manage_options';
-	
+    private $option_name = 'zhngrupa_open_graph_options'
+    private static $instance = null;
+
     private $fields = [
         [
             'id' => 'og_title',
@@ -49,13 +51,27 @@ class Settings_Page {
         ],
     ];
 
-    public function init() {
-        $settings_handler = new Settings_Handler();
-        add_action('admin_init', [$settings_handler, 'register_settings']);
-        add_action('admin_init', [$this, 'register_settings_page']);
+    public static function get_instance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 
-    public function register_settings_page() {
+    private function __construct() {
+        $this->init();
+    }
+
+    private function init() {
+        //error_log('init called');
+        add_action('admin_init', [$this, 'register_settings']);
+        add_action('admin_menu', [$this, 'add_settings_page']);
+    }
+
+    public function register_settings() {
+        //error_log('register_settings called');
+        register_setting($this->option_name, $this->option_name);
+
         add_settings_section(
             'zhngrupa_open_graph_section',
             'Open Graph Settings',
@@ -75,169 +91,89 @@ class Settings_Page {
         }
     }
 
+    public function add_settings_page() {
+        //error_log('add_settings_page called');
+        add_options_page(
+            'Open Graph Settings',
+            'Open Graph',
+            $this->capability,
+            'zhngrupa-open-graph-settings',
+            [$this, 'settings_page_html']
+        );
+    }
+
+    public function settings_page_html() {
+        error_log('settings_page_html called');
+        ?>
+        <div class="wrap">
+            <h1>Open Graph Settings</h1>
+            <form method="post" action="options.php">
+                <?php
+                //error_log('settings_fields called');
+                settings_fields($this->option_name);
+
+                //error_log('do_settings_sections called');
+                do_settings_sections('zhngrupa-open-graph-settings');
+                submit_button();
+                ?>
+            </form>
+        </div>
+        <?php
+    }
+
     public function section_callback() {
         echo '<p>Configure Open Graph settings.</p>';
     }
 
     public function render_field($args) {
         $field = $args['field'];
-        $options = get_option('zhngrupa_open_graph_options');
+        $options = get_option($this->option_name); // Pobranie opcji
 
-		switch ( $field['type'] ) {
+        switch ($field['type']) {
+            case "text":
+                ?>
+                <input
+                    type="text"
+                    id="<?php echo esc_attr($field['id']); ?>"
+                    name="<?php echo esc_attr($this->option_name . '[' . $field['id'] . ']'); ?>"
+                    value="<?php echo isset($options[$field['id']]) ? esc_attr($options[$field['id']]) : ''; ?>"
+                >
+                <p class="description">
+                    <?php echo esc_html($field['description']); ?>
+                </p>
+                <?php
+                break;
 
-			case "text": {
-				?>
-				<input
-					type="text"
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-					value="<?php echo isset( $options[ $field['id'] ] ) ? esc_attr( $options[ $field['id'] ] ) : ''; ?>"
-				>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
+            case "textarea":
+                ?>
+                <textarea
+                    id="<?php echo esc_attr($field['id']); ?>"
+                    name="<?php echo esc_attr($this->option_name . '[' . $field['id'] . ']'); ?>"
+                ><?php echo isset($options[$field['id']]) ? esc_attr($options[$field['id']]) : ''; ?></textarea>
+                <p class="description">
+                    <?php echo esc_html($field['description']); ?>
+                </p>
+                <?php
+                break;
 
-			case "checkbox": {
-				?>
-				<input
-					type="checkbox"
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-					value="1"
-					<?php echo isset( $options[ $field['id'] ] ) ? ( checked( $options[ $field['id'] ], 1, false ) ) : ( '' ); ?>
-				>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
-
-			case "textarea": {
-				?>
-				<textarea
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-				><?php echo isset( $options[ $field['id'] ] ) ? esc_attr( $options[ $field['id'] ] ) : ''; ?></textarea>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
-
-			case "select": {
-				?>
-				<select
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-				>
-					<?php foreach( $field['options'] as $key => $option ) { ?>
-						<option value="<?php echo $key; ?>" 
-							<?php echo isset( $options[ $field['id'] ] ) ? ( selected( $options[ $field['id'] ], $key, false ) ) : ( '' ); ?>
-						>
-							<?php echo $option; ?>
-						</option>
-					<?php } ?>
-				</select>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
-
-			case "password": {
-				?>
-				<input
-					type="password"
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-					value="<?php echo isset( $options[ $field['id'] ] ) ? esc_attr( $options[ $field['id'] ] ) : ''; ?>"
-				>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
-
-			case "wysiwyg": {
-				wp_editor(
-					isset( $options[ $field['id'] ] ) ? $options[ $field['id'] ] : '',
-					$field['id'],
-					array(
-						'textarea_name' => 'wporg_options[' . $field['id'] . ']',
-						'textarea_rows' => 5,
-					)
-				);
-				break;
-			}
-
-			case "email": {
-				?>
-				<input
-					type="email"
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-					value="<?php echo isset( $options[ $field['id'] ] ) ? esc_attr( $options[ $field['id'] ] ) : ''; ?>"
-				>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
-
-			case "url": {
-				?>
-				<input
-					type="url"
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-					value="<?php echo isset( $options[ $field['id'] ] ) ? esc_attr( $options[ $field['id'] ] ) : ''; ?>"
-				>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
-
-			case "color": {
-				?>
-				<input
-					type="color"
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-					value="<?php echo isset( $options[ $field['id'] ] ) ? esc_attr( $options[ $field['id'] ] ) : ''; ?>"
-				>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
-
-			case "date": {
-				?>
-				<input
-					type="date"
-					id="<?php echo esc_attr( $field['id'] ); ?>"
-					name="wporg_options[<?php echo esc_attr( $field['id'] ); ?>]"
-					value="<?php echo isset( $options[ $field['id'] ] ) ? esc_attr( $options[ $field['id'] ] ) : ''; ?>"
-				>
-				<p class="description">
-					<?php esc_html_e( $field['description'], 'my-plugin-settings' ); ?>
-				</p>
-				<?php
-				break;
-			}
-
-		}
-
+            case "url":
+                ?>
+                <input
+                    type="url"
+                    id="<?php echo esc_attr($field['id']); ?>"
+                    name="<?php echo esc_attr($this->option_name . '[' . $field['id'] . ']'); ?>"
+                    value="<?php echo isset($options[$field['id']]) ? esc_attr($options[$field['id']]) : ''; ?>"
+                >
+                <p class="description">
+                    <?php echo esc_html($field['description']); ?>
+                </p>
+                <?php
+                break;
+        }
     }
 }
+
+// Inicjalizacja strony ustawień
+add_action('plugins_loaded', function() {
+    $settings_page = Settings_Page::get_instance();
+});
