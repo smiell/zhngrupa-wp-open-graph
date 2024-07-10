@@ -45,9 +45,6 @@ class zhngrupa_WP_Open_Graph
         $open_graph = new ZHNGRUPA\OpenGraph\OpenGraph\Open_Graph();
         $open_graph->init();
 
-        // Initialize settings page.
-        // $settings_page = new ZHNGRUPA\OpenGraph\Settings\Settings_Page();
-        // $settings_page->init();
     }
 
 }

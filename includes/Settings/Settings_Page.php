@@ -27,25 +27,31 @@ class Settings_Page {
         ],
         [
             'id' => 'twitter_title',
-            'label' => 'Twitter Image URL',
+            'label' => 'Twitter Card title',
             'description' => 'Enter the title for twitter tags.',
             'type' => 'text',
         ],
         [
+            'id' => 'twitter_image',
+            'label' => 'Twitter Card Image URL',
+            'description' => 'Enter the URL of the image for twitter tags.',
+            'type' => 'text',
+        ],
+        [
             'id' => 'twitter_domain',
-            'label' => 'Twitter domain name',
+            'label' => 'Twitter card domain name',
             'description' => 'Enter the domain name for twitter tags.',
             'type' => 'text',
         ],
         [
             'id' => 'twitter_description',
-            'label' => 'Twitter domain name',
+            'label' => 'Twitter card description',
             'description' => 'Enter the description for twitter tags.',
             'type' => 'textarea',
         ],
         [
             'id' => 'twitter_url',
-            'label' => 'Twitter domain name',
+            'label' => 'Twitter card domain name',
             'description' => 'Enter the url for twitter tags.',
             'type' => 'url',
         ],
@@ -102,24 +108,6 @@ class Settings_Page {
         );
     }
 
-    public function settings_page_html() {
-        error_log('settings_page_html called');
-        ?>
-        <div class="wrap">
-            <h1>Open Graph Settings</h1>
-            <form method="post" action="options.php">
-                <?php
-                //error_log('settings_fields called');
-                settings_fields($this->option_name);
-
-                //error_log('do_settings_sections called');
-                do_settings_sections('zhngrupa-open-graph-settings');
-                submit_button();
-                ?>
-            </form>
-        </div>
-        <?php
-    }
 
     public function section_callback() {
         echo '<p>Configure Open Graph settings.</p>';
@@ -127,7 +115,7 @@ class Settings_Page {
 
     public function render_field($args) {
         $field = $args['field'];
-        $options = get_option($this->option_name); // Pobranie opcji
+        $options = get_option($this->option_name);
 
         switch ($field['type']) {
             case "text":
