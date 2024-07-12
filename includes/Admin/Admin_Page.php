@@ -82,8 +82,11 @@ class Admin_Page implements Admin_Page_Interface {
     
 
     function zhngrupa_open_graph_admin_side_css() {
-        wp_register_style( 'zhn-open-graph-admin-css', plugin_dir_url( __FILE__ ) . '../../assets/css/admin.css', [] );
-        wp_enqueue_style( 'zhn-open-graph-admin-css' );
+        // Prevent register on all admin side sites
+        if( isset( $_GET['page'] ) && $_GET['page'] == "zhngrupa-open-graph-settings" ) {
+            wp_register_style( 'zhn-open-graph-admin-css', plugin_dir_url( __FILE__ ) . '../../assets/css/admin.css', [] );
+            wp_enqueue_style( 'zhn-open-graph-admin-css' );
+        }
     }
     
 }
