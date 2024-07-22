@@ -2,7 +2,7 @@
 /*
 Plugin Name: zhngrupa-wp-open-graph
 Description: Provide support for Open Graph Protocol in Wordpress site
-Version: 1.0
+Version: 1.1
 Author: ZHNGRUPA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ | Jacek Śmiel
 */
 

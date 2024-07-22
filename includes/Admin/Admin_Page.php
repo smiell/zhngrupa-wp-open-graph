@@ -68,6 +68,13 @@ class Admin_Page implements Admin_Page_Interface {
         }
         echo '</div>';
         
+        echo '<div>';
+        echo '<h4>Configured data not reflected?</h4>';
+        echo '<p>If the configuration is not displayed correctly, we recommend disabling the cache on the affected page. In case of further problems, it is advisable to contact your hosting provider.</p>';
+        $fullSiteUrl = 'https://developers.facebook.com/tools/debug/?q='.parse_url( get_site_url(), PHP_URL_HOST );
+        echo '<p>It may also be helpful to clear the cache of your Facebook site if your data is not displaying correctly on that platform. You can go quick to <a href="'.$fullSiteUrl.'" target="_blank">that settings</a>.</p>';
+        echo '</div>';
+
         echo '</div>'; // End of right-column
         
         echo '</div>'; // End of wrap
